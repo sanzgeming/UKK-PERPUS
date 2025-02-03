@@ -56,14 +56,19 @@ class RakController extends Controller
 
     public function update(Request $request, $id)
     {
+        $rak = Rak::findOrFail($id); // Cari rak berdasarkan ID
+
+        // Validasi input tanpa memperbarui kode_rak
         $request->validate([
-            'kode_rak' => 'required|max:10|unique:tbl_rak,kode_rak,' . $id . ',id_rak',
             'rak' => 'required|max:25|unique:tbl_rak,rak,' . $id . ',id_rak',
             'keterangan' => 'required|max:50',
         ]);
 
-        $rak = Rak::findOrFail($id);
-        $rak->update($request->all());
+        // Hanya perbarui field yang dibutuhkan
+        $rak->update([
+            'rak' => $request->rak,
+            'keterangan' => $request->keterangan,
+        ]);
 
         return redirect()->route('rak.index')->with('success', 'Rak berhasil diperbarui.');
     }

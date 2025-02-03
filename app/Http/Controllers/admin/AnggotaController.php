@@ -90,6 +90,7 @@ class AnggotaController extends Controller
             'username' => 'required|unique:tbl_anggota,username,' . $anggota->id_anggota . ',id_anggota',
             'password' => 'nullable|min:8',  // Membuat password sebagai nullable
             'fa' => 'required',
+            'keterangan' => 'nullable|string|max:255' // Validasi tambahan untuk keterangan
         ]);
 
         // Jika password tidak kosong, enkripsi dan set password

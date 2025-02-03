@@ -40,7 +40,7 @@ class DdcController extends Controller
             'keterangan' => $request->keterangan,
         ]);
 
-        return redirect()->route('admin.ddc.index')->with('success', 'Data DDC berhasil ditambahkan.');
+        return redirect()->route('ddc.index')->with('success', 'Data DDC berhasil ditambahkan.');
     }
 
 

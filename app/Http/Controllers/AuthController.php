@@ -25,17 +25,23 @@ class AuthController extends Controller
 
         $user = TblAnggota::where('username', $credentials['username'])->first();
 
-        if ($user && Hash::check($credentials['password'], $user->password)) {
-            Auth::login($user);
+        if ($user) {
+            if ($user->fa === 'T') {
+                return back()->withErrors(['error' => 'Akun Anda belum aktif. Silakan hubungi admin untuk mengaktifkan akun.']);
+            }
 
-            if ($user->id_jenis_anggota == 3) {
-                return redirect()->route('admin.dashboard');
-            } else {
-                return redirect()->route(('user.index'));
+            if (Hash::check($credentials['password'], $user->password)) {
+                Auth::login($user);
+
+                if ($user->id_jenis_anggota == 3) {
+                    return redirect()->route('admin.dashboard');
+                } else {
+                    return redirect()->route('user.index');
+                }
             }
         }
 
-        return back()->withErrors(['error' => 'Invalid credentials']);
+        return back()->withErrors(['error' => 'Username atau password salah.']);
     }
 
     public function logout()
