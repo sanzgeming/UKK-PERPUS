@@ -31,19 +31,20 @@ class TransaksiController extends Controller
         $request->validate([
             'id_pustaka' => 'required|exists:tbl_pustaka,id_pustaka',
             'id_anggota' => 'required|exists:tbl_anggota,id_anggota',
-            'tgl_pinjam' => 'required|date',
-            'tgl_kembali' => 'required|date|after_or_equal:tgl_pinjam',
             'fp' => 'required|in:0,1',
             'keterangan' => 'nullable|string|max:50',
         ]);
 
+        $tgl_pinjam = now()->format('Y-m-d'); // Tanggal pinjam otomatis hari ini
+        $tgl_kembali = now()->addDays(7)->format('Y-m-d'); // Tanggal kembali otomatis 7 hari dari hari ini
+
         Transaksi::create([
             'id_pustaka' => $request->id_pustaka,
             'id_anggota' => $request->id_anggota,
-            'tgl_pinjam' => $request->tgl_pinjam,
-            'tgl_kembali' => $request->tgl_kembali,
-            'tgl_pengembalian' => null, // Default null saat buku dipinjam
-            'fp' => $request->fp, // 0: Belum selesai, 1: Selesai
+            'tgl_pinjam' => $tgl_pinjam,
+            'tgl_kembali' => $tgl_kembali,
+            'tgl_pengembalian' => null,
+            'fp' => $request->fp,
             'keterangan' => $request->keterangan,
         ]);
 
@@ -62,43 +63,43 @@ class TransaksiController extends Controller
     // Memperbarui transaksi
     // Memperbarui transaksi
     public function update(Request $request, $id)
-{
-    $request->validate([
-        'id_pustaka' => 'required|exists:tbl_pustaka,id_pustaka',
-        'id_anggota' => 'required|exists:tbl_anggota,id_anggota',
-        'tgl_pinjam' => 'required|date',
-        'tgl_kembali' => 'required|date|after_or_equal:tgl_pinjam',
-        'tgl_pengembalian' => 'nullable|date|after_or_equal:tgl_pinjam',
-        'fp' => 'required|in:0,1',
-        'keterangan' => 'nullable|string|max:50',
-    ]);
+    {
+        $request->validate([
+            'id_pustaka' => 'required|exists:tbl_pustaka,id_pustaka',
+            'id_anggota' => 'required|exists:tbl_anggota,id_anggota',
+            'tgl_pinjam' => 'required|date',
+            'tgl_kembali' => 'required|date|after_or_equal:tgl_pinjam',
+            'tgl_pengembalian' => 'nullable|date|after_or_equal:tgl_pinjam',
+            'fp' => 'required|in:0,1',
+            'keterangan' => 'nullable|string|max:50',
+        ]);
 
-    $transaksi = Transaksi::findOrFail($id);
-    $anggotas = Anggota::find($request->id_anggota); // Ambil data jenis anggota untuk validasi batas pinjam
+        $transaksi = Transaksi::findOrFail($id);
+        $anggotas = Anggota::find($request->id_anggota); // Ambil data jenis anggota untuk validasi batas pinjam
 
-    // Tentukan batas waktu berdasarkan jenis anggota
-    $maxPinjam = ($anggotas->jenis == 'Guru') ? 10 : 5; // Guru pinjam 10 buku, siswa 5 buku
-    $tgl_pinjam = new \DateTime($request->tgl_pinjam);
-    $tgl_kembali = $tgl_pinjam->modify('+7 days')->format('Y-m-d'); // Batas waktu 7 hari setelah tanggal pinjam
+        // Tentukan batas waktu berdasarkan jenis anggota
+        $maxPinjam = ($anggotas->jenis == 'Guru') ? 10 : 5; // Guru pinjam 10 buku, siswa 5 buku
+        $tgl_pinjam = new \DateTime($request->tgl_pinjam);
+        $tgl_kembali = $tgl_pinjam->modify('+7 days')->format('Y-m-d'); // Batas waktu 7 hari setelah tanggal pinjam
 
-    // Jika tanggal kembali yang diinputkan tidak sesuai dengan batas waktu yang diizinkan
-    if ($request->tgl_kembali < $tgl_kembali) {
-        return back()->withErrors(['tgl_kembali' => 'Tanggal kembali tidak sesuai dengan reservasi anggota.'])->withInput();
+        // Jika tanggal kembali yang diinputkan tidak sesuai dengan batas waktu yang diizinkan
+        if ($request->tgl_kembali < $tgl_kembali) {
+            return back()->withErrors(['tgl_kembali' => 'Tanggal kembali tidak sesuai dengan reservasi anggota.'])->withInput();
+        }
+
+        // Update transaksi
+        $transaksi->update([
+            'id_pustaka' => $request->id_pustaka,
+            'id_anggota' => $request->id_anggota,
+            'tgl_pinjam' => $request->tgl_pinjam,
+            'tgl_kembali' => $request->tgl_kembali,
+            'tgl_pengembalian' => $request->tgl_pengembalian, // Bisa null jika belum dikembalikan
+            'fp' => $request->fp, // 0: Belum selesai, 1: Selesai
+            'keterangan' => $request->keterangan,
+        ]);
+
+        return redirect()->route('transaksi.index')->with('success', 'Transaksi berhasil diperbarui.');
     }
-
-    // Update transaksi
-    $transaksi->update([
-        'id_pustaka' => $request->id_pustaka,
-        'id_anggota' => $request->id_anggota,
-        'tgl_pinjam' => $request->tgl_pinjam,
-        'tgl_kembali' => $request->tgl_kembali,
-        'tgl_pengembalian' => $request->tgl_pengembalian, // Bisa null jika belum dikembalikan
-        'fp' => $request->fp, // 0: Belum selesai, 1: Selesai
-        'keterangan' => $request->keterangan,
-    ]);
-
-    return redirect()->route('transaksi.index')->with('success', 'Transaksi berhasil diperbarui.');
-}
 
 
     // Menghapus transaksi

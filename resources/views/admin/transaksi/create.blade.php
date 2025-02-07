@@ -77,4 +77,13 @@
         <button type="submit" class="btn btn-primary">Simpan</button>
     </div>
 </form>
+<script>
+    // Fungsi untuk mengupdate tanggal kembali otomatis setelah memilih tanggal pinjam
+    document.getElementById('tgl_pinjam').addEventListener('change', function () {
+        const tglPinjam = new Date(this.value);
+        const tglKembali = new Date(tglPinjam);
+        tglKembali.setDate(tglPinjam.getDate() + 7); // 7 hari setelah tanggal pinjam
+        document.getElementById('tgl_kembali').value = tglKembali.toISOString().split('T')[0];
+    });
+</script>
 @endsection
