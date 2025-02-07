@@ -28,6 +28,7 @@
             <label for="keterangan">Keterangan</label>
             <input type="text" name="keterangan" class="form-control" value="{{ $ddc->keterangan }}" maxlength="100">
         </div>
+        <a href="{{ route('ddc.index') }}" class="btn btn-secondary me-2 mt-3">Kembali</a>
         <button type="submit" class="btn btn-primary mt-3">Perbarui</button>
     </form>
 </div>

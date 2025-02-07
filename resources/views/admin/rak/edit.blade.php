@@ -15,7 +15,7 @@
             <textarea name="keterangan" class="form-control" id="keterangan" required>{{ $rak->keterangan }}</textarea>
         </div>
         <button type="submit" class="btn btn-primary">Update</button>
-        <a href="{{ route('rak.index') }}" class="btn btn-secondary">Batal</a>
+        <a href="{{ route('rak.index') }}" class="btn btn-secondary">Kembali</a>
     </form>
 </div>
 @endsection

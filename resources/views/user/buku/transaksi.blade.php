@@ -13,6 +13,8 @@
                     <th>Tanggal Kembali</th>
                     <th>Tanggal Pengembalian</th>
                     <th>Keterangan</th>
+                    <th>Status Denda</th>
+                    <th>Jumlah Denda</th>
                     <th>Dikembalikan</th>
                 </tr>
             </thead>
@@ -26,6 +28,15 @@
                         <td class="text-center">{{ $trans->tgl_pengembalian ?? '-' }}</td>
                         <td>{{ $trans->keterangan }}</td>
                         <td class="text-center">
+                            <span
+                                class="badge bg-{{ $trans->status_denda == 'Pengembalian Sesuai' ? 'success' : ($trans->status_denda == 'Denda Keterlambatan' ? 'warning' : 'danger') }}">
+                                {{ $trans->status_denda }}
+                            </span>
+                        </td>
+                        <td class="text-center">
+                            {{ $trans->jumlah_denda > 0 ? 'Rp' . number_format($trans->jumlah_denda, 0, ',', '.') : '-' }}
+                        </td>
+                        <td class="text-center">
                             <span class="badge bg-{{ $trans->fp == '0' ? 'danger' : 'success' }}">
                                 {{ $trans->fp == '0' ? 'Belum Dikembalikan' : 'Sudah Dikembalikan' }}
                             </span>
@@ -33,7 +44,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="8" class="text-center text-muted">Anda belum memiliki transaksi.</td>
+                        <td colspan="9" class="text-center text-muted">Anda belum memiliki transaksi.</td>
                     </tr>
                 @endforelse
             </tbody>

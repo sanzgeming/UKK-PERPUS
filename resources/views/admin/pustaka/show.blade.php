@@ -46,6 +46,14 @@
             <td>{{ $pustaka->harga_buku }}</td>
         </tr>
         <tr>
+            <th>Denda Terlambat</th>
+            <td>{{ $pustaka->denda_terlambat }}</td>
+        </tr>
+        <tr>
+            <th>Denda Hilang</th>
+            <td>{{ $pustaka->denda_hilang }}</td>
+        </tr>
+        <tr>
             <th>Jumlah Buku</th>
             <td>{{ $pustaka->jml_pinjam }}</td>
         </tr>

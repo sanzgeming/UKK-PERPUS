@@ -32,19 +32,19 @@
     <div class="mb-4">
         <label for="tgl_pinjam" class="block text-gray-700">Tanggal Pinjam</label>
         <input type="date" name="tgl_pinjam" id="tgl_pinjam" required value="{{ $transaksi->tgl_pinjam }}"
-            class="w-full p-2 border rounded form-control">
+            class="w-full p-2 border rounded form-control" readonly>
     </div>
 
     <div class="mb-4">
         <label for="tgl_kembali" class="block text-gray-700">Tanggal Kembali</label>
         <input type="date" name="tgl_kembali" id="tgl_kembali" required value="{{ $transaksi->tgl_kembali }}"
-            class="w-full p-2 border rounded form-control">
+            class="w-full p-2 border rounded form-control" readonly>
     </div>
 
     <div class="mb-4">
         <label for="tgl_pengembalian" class="block text-gray-700">Tanggal Pengembalian</label>
         <input type="date" name="tgl_pengembalian" id="tgl_pengembalian" value="{{ $transaksi->tgl_pengembalian }}"
-            class="w-full p-2 border rounded form-control">
+            class="w-full p-2 border rounded form-control" min="{{ date('Y-m-d') }}">
     </div>
 
     <div class="mb-4">
@@ -62,8 +62,24 @@
     </div>
 
     <div>
-        <a href="{{ route('rak.index') }}" class="btn btn-secondary me-2">Kembali</a>
+        <a href="{{ route('transaksi.index') }}" class="btn btn-secondary me-2">Kembali</a>
         <button type="submit" class="btn btn-primary">Simpan</button>
     </div>
 </form>
+
+<script>
+    // Fungsi untuk mengupdate tanggal kembali otomatis setelah memilih tanggal pinjam
+    document.getElementById('tgl_pinjam').addEventListener('change', function () {
+        const tglPinjam = new Date(this.value);
+        const tglKembali = new Date(tglPinjam);
+        tglKembali.setDate(tglPinjam.getDate() + 7); // 7 hari setelah tanggal pinjam
+        document.getElementById('tgl_kembali').value = tglKembali.toISOString().split('T')[0];
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const tglPengembalianInput = document.getElementById('tgl_pengembalian');
+        const today = new Date().toISOString().split('T')[0];
+        tglPengembalianInput.setAttribute('min', today);
+    });
+</script>
 @endsection

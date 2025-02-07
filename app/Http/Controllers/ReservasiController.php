@@ -19,30 +19,38 @@ class ReservasiController extends Controller
 
     public function reservasi(Request $request, $id)
     {
-        $pustaka = Pustaka::where('id_pustaka', $id)->first();
-        $id_anggota = Auth::id(); // Mengambil ID anggota yang sedang login
+        $request->validate([
+            'tgl_pinjam' => 'required|date|after_or_equal:today',
+            'keterangan' => 'required|max:50',
+        ]);
 
-        // Cek apakah anggota sudah memiliki transaksi dengan status fp = 0 (belum dikembalikan)
+        $tgl_kembali = now()->parse($request->tgl_pinjam)->addDays(7)->format('Y-m-d');
+
+        $pustaka = Pustaka::findOrFail($id);
+        $id_anggota = Auth::id();
+
+        // Cek apakah anggota memiliki transaksi aktif
         $transaksiAktif = Transaksi::where('id_anggota', $id_anggota)
-            ->where('fp', '0') // status fp = 0 berarti belum dikembalikan
+            ->where('fp', '0')
             ->exists();
 
         if ($transaksiAktif) {
-            // Jika ada transaksi yang belum dikembalikan
             return redirect()->back()->with('error', 'Anda masih memiliki buku yang belum dikembalikan.');
         }
 
-        // Buat transaksi baru jika tidak ada transaksi yang aktif
+        // Simpan transaksi baru
         Transaksi::create([
-            'id_pustaka' => $request->id,
+            'id_pustaka' => $id,
             'id_anggota' => $id_anggota,
-            'tgl_pinjam' => now(),
-            'tgl_kembali' => now()->addDays(7), // Atur tanggal kembali 7 hari dari sekarang
-            'fp' => '0', // Flag pinjam
-            'keterangan' => 'Reservasi buku',
+            'tgl_pinjam' => $request->tgl_pinjam,
+            'tgl_kembali' => $tgl_kembali,
+            'fp' => '0',
+            'keterangan' => $request->keterangan,
+            'denda_terlambat' => 0,
+            'denda_hilang' => 0,
         ]);
 
-        return redirect()->back()->with('success', 'Reservasi buku berhasil dilakukan.');
+        return redirect()->route('buku.transaksi')->with('success', 'Reservasi buku berhasil.');
     }
 
 
@@ -74,9 +82,35 @@ class ReservasiController extends Controller
 
     public function transaksi()
     {
-        $id_anggota = Auth::id(); // Mengambil ID anggota yang sedang login
+        $id_anggota = Auth::id(); // ID anggota yang sedang login
 
+        // Ambil transaksi terkait anggota yang login
         $transaksi = Transaksi::where('id_anggota', $id_anggota)->get();
+
+        foreach ($transaksi as $trans) {
+            // Hitung jumlah hari keterlambatan
+            if ($trans->tgl_pengembalian && $trans->tgl_pengembalian > $trans->tgl_kembali) {
+                $tgl_kembali = new \DateTime($trans->tgl_kembali);
+                $tgl_pengembalian = new \DateTime($trans->tgl_pengembalian);
+
+                // Hitung selisih hari keterlambatan
+                $daysLate = $tgl_kembali->diff($tgl_pengembalian)->days;
+
+                // Set status denda
+                if ($daysLate <= 5) {
+                    $trans->status_denda = 'Denda Keterlambatan';
+                    $trans->jumlah_denda = $daysLate * $trans->pustaka->denda_terlambat;
+                } else {
+                    $trans->status_denda = 'Denda Kehilangan';
+                    $trans->jumlah_denda = $trans->pustaka->denda_hilang;
+                }
+            } else {
+                $trans->status_denda = 'Pengembalian Sesuai';
+                $trans->jumlah_denda = 0;
+            }
+        }
+
         return view('user.buku.transaksi', compact('transaksi'));
     }
+
 }

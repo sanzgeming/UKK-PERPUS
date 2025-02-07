@@ -25,6 +25,7 @@
             <label for="keterangan" class="form-label">Keterangan</label>
             <textarea name="keterangan" class="form-control" id="keterangan">{{ $jenisAnggota->keterangan }}</textarea>
         </div>
+        <a href="{{ route('jenisanggota.index') }}" class="btn btn-secondary">Batal</a>
         <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
     </form>
 </div>

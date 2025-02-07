@@ -73,7 +73,7 @@
     </div>
 
     <div class="mb-4">
-        <a href="{{ route('rak.index') }}" class="btn btn-secondary me-2">Kembali</a>
+        <a href="{{ route('transaksi.index') }}" class="btn btn-secondary me-2">Kembali</a>
         <button type="submit" class="btn btn-primary">Simpan</button>
     </div>
 </form>

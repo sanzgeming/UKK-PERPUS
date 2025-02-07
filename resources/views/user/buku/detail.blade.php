@@ -20,7 +20,7 @@
             <p><strong>Kategori DDC:</strong> {{ $buku->ddc->ddc }}</p>
             <p><strong>Jumlah Buku:</strong> {{ $buku->jml_pinjam }}</p>
             <p><strong>Kondisi Buku:</strong> {{ $buku->kondisi_buku }}</p>
-            <p><strong>Harga Buku:</strong> Rp{{ number_format($buku->harga_buku, 0, ',', '.') }}</p>
+            <p><strong>Harga Buku:</strong> Rp {{ number_format($buku->harga_buku, 0, ',', '.') }}</p>
             <p>{{ $buku->abstraksi }}</p>
 
             <!-- Tombol Kembali dan Reservasi -->

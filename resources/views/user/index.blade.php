@@ -29,7 +29,7 @@
 
         /* Jumbotron Modern */
         .jumbotron {
-            padding: 150px 0;
+            padding: 100px 0;
             background-color: #333;
         }
 
@@ -180,7 +180,7 @@
 
 <body>
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg bg-dark">
+    <nav class="navbar navbar-expand-lg bg-dark fixed-top">
         <div class="container">
             <a class="navbar-brand" href="">Perpustakaan Sekolah</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
@@ -190,7 +190,7 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link btn btn-danger me-2" href="{{ route('logout') }}">Logout</a>
+                        <a class="nav-link btn btn-danger me-15" href="{{ route('logout') }}">Logout</a>
                     </li>
                 </ul>
             </div>
@@ -209,7 +209,7 @@
                 <a href="#about" class="btn btn-success mt-3">Pelajari Lebih Lanjut</a>
             </div>
             <div class="right-content">
-                <img src="{{ asset('storage/images/lovepik.png') }}" alt="Library Image" class="img-fluid rounded">
+                <img src="{{ asset('storage/images/lovepik.png') }}" alt="Library Image" class="img-fluid rounded" style="width : 65vh;">
             </div>
         </div>
     </section>
